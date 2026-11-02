@@ -1,0 +1,41 @@
+erDiagram
+    CUSTOMER {
+        string customer_id PK "format: C###"
+    }
+
+    ORDER {
+        string  order_id    PK "format: O####"
+        string  customer_id FK "→ CUSTOMER"
+        string  product_id  FK "→ PRODUCT"
+        date    order_date     "ISO 8601"
+        string  order_status   "Pending|Shipped|Delivered|Canceled"
+        int     quantity       "assumed = 1 (absent from source)"
+    }
+
+    PRODUCT {
+        string product_id PK "format: P###"
+    }
+
+    WAREHOUSE {
+        string warehouse_id PK "format: W##"
+    }
+
+    INVENTORY_RECORD {
+        string product_id   PK "FK → PRODUCT"
+        string warehouse_id PK "FK → WAREHOUSE"
+        int    stock_quantity  "≥ 0"
+    }
+
+    SHIPMENT {
+        string shipment_id         PK "format: S####"
+        string order_id            FK "→ ORDER"
+        string carrier                "CarrierA|CarrierB|CarrierC"
+        string status                 "In Transit|Delivered|Delayed"
+        float  estimated_lead_days    "derived from carrier assumption"
+    }
+
+    CUSTOMER   ||--o{ ORDER            : "places"
+    ORDER      }o--||  PRODUCT         : "is for"
+    ORDER      ||--o|  SHIPMENT        : "has"
+    PRODUCT    ||--o{ INVENTORY_RECORD : "stocked via"
+    WAREHOUSE  ||--o{ INVENTORY_RECORD : "holds"
